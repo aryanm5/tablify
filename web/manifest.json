@@ -1,0 +1,10 @@
+{
+    "manifest_version": 3,
+    "name": "Tablify",
+    "description": "AI Powered Tab Manager",
+    "version": "1.0",
+    "action": {
+      "default_popup": "tablify.html",
+      "default_icon": "testImage.png"
+    }
+  }
