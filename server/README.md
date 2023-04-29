@@ -1,1 +1,1 @@
-# AWS Lambda/DynamoDB backetnd
+# AWS Lambda/DynamoDB backend
