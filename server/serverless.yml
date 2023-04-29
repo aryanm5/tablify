@@ -1,0 +1,98 @@
+service: tablify-server
+frameworkVersion: '3'
+
+plugins:
+  - serverless-stage-manager
+  - serverless-domain-manager
+  - serverless-plugin-optimize
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  architecture: arm64
+  httpApi:
+    disableDefaultEndpoint: true
+    shouldStartNameWithService: true
+  stage: ${opt:stage, 'dev'}
+  environment:
+    STAGE: ${self:provider.stage}
+    PASS: ${self:custom.env.pass}
+  iam: # permissions for functions
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - apigateway:*
+            - dynamodb:*
+            - s3:*
+            - cloudwatch:*
+          Resource: '*'
+
+
+
+
+package:
+  individually: true
+  excludeDevDependencies: true # false for tree shaking package
+#  patterns: # include these in package
+#    - src/**
+#    - package.json
+#    - env/**
+#    - serverless.yml
+#  include:
+#    - src/**
+  exclude:
+    - README.md
+
+functions:
+  updateTabs:
+    handler: src/handlers/private/updateTabs.updateTabs
+    events:
+      - httpApi:
+          path: /updateTabs
+          method: post
+  updateGroups:
+    handler: src/handlers/public/updateGroups.updateGroups
+    events:
+      - httpApi:
+          path: /updateGroups
+          method: post
+  fetchGroups:
+    handler: src/handlers/public/fetchGroups.fetchGroups
+    events:
+      - httpApi:
+          path: /fetchGroups
+          method: get
+
+resources:
+  Resources:
+    tabTable:
+          Type: AWS::DynamoDB::Table
+          Properties:
+            TableName: ${self:custom.env.tableName}
+            AttributeDefinitions:
+              - AttributeName: id
+                AttributeType: S
+            KeySchema:
+              - AttributeName: id
+                KeyType: HASH
+            BillingMode: PAY_PER_REQUEST
+
+
+custom:
+  optimize:
+    global: true # Minifies node_modules
+  stages:
+    - dev
+    - prod
+  env: ${file(env/${self:provider.stage}.yml)}
+  customDomain:
+    domainName: api.mittaldev.com
+    stage: ${self:provider.stage}
+    basePath: ${self:custom.env.basePath}
+    certificateName: '*.mittaldev.com'
+    createRoute53Record: true
+    endpointType: 'regional'
+    securityPolicy: tls_1_2
+    autoDomain: false
+    apiType: http

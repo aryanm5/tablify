@@ -1,0 +1,27 @@
+{
+    "name": "tablify-server",
+    "version": "1.0.0",
+    "description": "Tablify server",
+    "main": "index.js",
+    "scripts": {
+      "lint": "eslint src/**"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/aryanm5/tablify.git"
+    },
+    "keywords": [],
+    "author": "Aryan Mittal",
+    "license": "MIT",
+    "bugs": {
+      "url": "https://github.com/aryanm5/tablify/issues"
+    },
+    "homepage": "https://github.com/aryanm5/tablify#readme",
+    "devDependencies": {
+      "eslint": "^8.37.0",
+      "serverless-domain-manager": "^7.0.2",
+      "serverless-plugin-optimize": "^4.2.1-rc.1",
+      "serverless-stage-manager": "^1.0.5"
+    },
+    "dependencies": {}
+  }

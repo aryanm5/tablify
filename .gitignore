@@ -35,7 +35,6 @@ Thumbs.db
 .awcache
 bower_components
 node_modules
-package-lock.json
 dist
 
 # Custom
@@ -47,3 +46,8 @@ dist
 .env.development.local
 .env.test.local
 .env.production.local
+jspm_packages
+.serverless
+_optimize
+.vscode
+server/env
