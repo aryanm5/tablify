@@ -36,7 +36,6 @@ Response structure:
             groups: [
                 {
                     name: "History",
-                    color: "#8B8000",
                     tabs: [tabId1, tabId2]
                 },
                 {...}
