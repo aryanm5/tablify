@@ -1,5 +1,5 @@
-import { updateItem } from '../../services/updateItem.js';
-import { parseRequest, success, error } from '../../helpers/general.js';
+import { updateItem } from '../../services/updateItem';
+import { parseRequest, success, error } from '../../helpers/general';
 
 module.exports.updateTabs = async evt => {
     const req = parseRequest(evt);
@@ -18,6 +18,7 @@ module.exports.updateTabs = async evt => {
                 {
                     tabs: win.tabs,
                     lastUpdated: now,
+                    groups: null,
                 })),
         );
     } catch (err) {
