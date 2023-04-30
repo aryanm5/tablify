@@ -52,45 +52,4 @@ chrome.tabs.query({}, function (tabs) {
   }
 });
 
-/*
-chrome.tabs.onActivated.addListener(moveToFirstPosition);
 
-async function moveToFirstPosition(activeInfo) {
-  try {
-    await chrome.tabs.move(activeInfo.tabId, { index: 0 });
-    console.log("Success.");
-  } catch (error) {
-    if (
-      error ==
-      "Error: Tabs cannot be edited right now (user may be dragging a tab)."
-    ) {
-      setTimeout(() => moveToFirstPosition(activeInfo), 50);
-    } else {
-      console.error(error);
-    }
-  }
-}
-*/
-
-// Listen for messages from the content script
-
-// background.js
-
-/*
-// Get the current active tab
-chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-  // Inject the content script into the tab
-  const functionToExecute = () => {
-    return document.body.innerText;
-  };
-  chrome.scripting.executeScript(
-    {
-      target: { tabId: tabs[0].id },
-      function: functionToExecute,
-    },
-    (res) => {
-      console.log(res);
-    }
-  );
-});
-*/
