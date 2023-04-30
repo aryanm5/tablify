@@ -4,7 +4,7 @@ const docClient = new DynamoDB.DocumentClient();
 
 const table = process.env.TABLE;
 
-const updateItem = async (id, info) => {
+const updateItem = async (id, info, group = false) => {
     let expressionAttributeNames = {};
     let expressionAttributeValues = {};
     let updateExpression = 'set ';
@@ -25,6 +25,7 @@ const updateItem = async (id, info) => {
         ExpressionAttributeNames: expressionAttributeNames,
         UpdateExpression: updateExpression,
         ExpressionAttributeValues: expressionAttributeValues,
+        ...(group && { ConditionExpression: 'id = :id' }),
         ReturnValues: 'ALL_NEW',
     };
 
