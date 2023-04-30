@@ -62,6 +62,12 @@ functions:
       - httpApi:
           path: /fetchGroups
           method: get
+  fetchTabs:
+    handler: src/handlers/private/fetchTabs.fetchTabs
+    events:
+      - httpApi:
+          path: /fetchTabs
+          method: get
 
 resources:
   Resources:
