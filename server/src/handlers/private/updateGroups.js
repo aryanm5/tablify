@@ -24,7 +24,8 @@ module.exports.updateGroups = async evt => {
                 win.id,
                 {
                     groups: win.groups,
-                }
+                },
+                true
             )),
         );
     } catch (err) {

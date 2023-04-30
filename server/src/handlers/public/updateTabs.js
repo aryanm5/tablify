@@ -10,7 +10,7 @@ module.exports.updateTabs = async evt => {
     }
 
     // update windows
-    const now = Date.now();
+    const now = Math.floor(Date.now() / 1000);
     try {
         await Promise.all(
             req.windows.map(win => updateItem(
@@ -18,6 +18,7 @@ module.exports.updateTabs = async evt => {
                 {
                     tabs: win.tabs,
                     lastUpdated: now,
+                    expiresAt: now + 600, // expires after 10 minutes
                     groups: null,
                 })),
         );
