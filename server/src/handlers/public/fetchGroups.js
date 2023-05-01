@@ -2,7 +2,7 @@ import { batchGetItems } from '../../services/batchGetItems';
 import { success, error } from '../../helpers/general';
 
 module.exports.fetchGroups = async evt => {
-    
+
     // input validation
     if (evt.queryStringParameters.windows === undefined) {
         return error(`The 'windows' key is missing. Make sure the data is structured correctly. Received input: ${JSON.stringify(evt.queryStringParameters, null, 2)}`, 400);
