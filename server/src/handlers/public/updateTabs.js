@@ -19,7 +19,7 @@ module.exports.updateTabs = async evt => {
                     tabs: win.tabs,
                     lastUpdated: now,
                     expiresAt: now + 600, // expires after 10 minutes
-                    groups: null,
+                    //groups: null,
                 })),
         );
     } catch (err) {
