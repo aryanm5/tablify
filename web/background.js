@@ -65,7 +65,7 @@ chrome.tabs.query({}, function (tabs) {
       }
     }
 
-    let inter = largestChunk + chunks;
+    let inter = largestChunk;
 
     let newString = inter.replace(/['"]/g, "");
 
@@ -153,18 +153,82 @@ chrome.tabs.query({}, function (tabs) {
                 }
               });
             }
-            console.log("final", final);
+            console.log("final", JSON.stringify(final));
           }
-          fetch("https://api.mittaldev.com/tablify-dev/updateTabs", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ windows: final }),
-          })
-            .then((response) => console.log(response))
-            .then((data) => console.log(data))
-            .catch((error) => console.error(error));
+
+          console.log("windowsdownhere", windows);
+
+          setInterval(function () {
+            fetch("https://api.mittaldev.com/tablify-dev/updateTabs", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                windows: final,
+              }),
+            })
+              .then((response) => {
+                if (response.ok) {
+                  return response.json();
+                } else {
+                  throw new Error("Network response was not ok");
+                }
+              })
+              .then((data) => {
+                console.log(data);
+              })
+              .catch((error) => {
+                console.error("Error:", error);
+              });
+          }, 5000);
+
+          setInterval(function () {
+            fetch(
+              `https://api.mittaldev.com/tablify-dev/fetchGroups?windows=${JSON.stringify(
+                windows
+              )}`,
+              {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            )
+              .then((response) => {
+                response.json().then(function (json) {
+                  //console.log("JSON: " + JSON.stringify(json));
+
+                  let data = JSON.parse(JSON.stringify(json));
+                  data.forEach((window) => {
+                    window.groups.forEach((group) => {
+                      let tabIds = group.tabs.map((t) => t.id);
+                      console.log(`tabIds: ${tabIds}`);
+                      console.log(`tabs: ${tabs[0].id}`);
+                      chrome.tabs.group(
+                        {
+                          //groupId: group.id,
+                          tabIds: tabIds,
+                        },
+                        function () {
+                          console.log("Tabs moved to new group");
+                        }
+                      );
+                    });
+                  });
+                });
+
+                if (response.ok) {
+                  //return response.json();
+                } else {
+                  throw new Error("Network response was not ok");
+                }
+              })
+              .then(() => {})
+              .catch((error) => {
+                console.error("Error:", error);
+              });
+          }, 6000);
         }
       });
   }
