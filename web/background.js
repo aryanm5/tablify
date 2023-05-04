@@ -24,61 +24,64 @@ const scrapeData = () => {
 
 setInterval(() => {
   const final = [];
+  let windowIDS = [];
 
   chrome.windows.getAll({ populate: false }, (windows) => {
     windows.forEach((window) => {
-      final.push({ id: window.id, tabs: [] });
+      final.push({ id: window.id.toString(), tabs: [] });
+      windowIDS.push(window.id.toString());
     });
   });
 
+  console.log("windowids", windowIDS);
+
   chrome.tabs.query({}, (tabs) => {
-    tabs.forEach((tab) => {
+    for (let i = 0; i < tabs.length; i++) {
       chrome.scripting
         .executeScript({
-          target: { tabId: tab.id },
+          target: { tabId: tabs[i].id },
           function: scrapeData,
         })
         .then((res) => {
           const smoothWebsiteText = res[0].result.replace(/[\n\r]/g, "");
           final.forEach((window) => {
-            if (tab.windowId == window.id) {
+            if (tabs[i].windowId == window.id) {
               window.tabs.push({
-                id: tab.id,
+                id: tabs[i].id.toString(),
                 content: smoothWebsiteText,
-                title: tab.title,
+                title: tabs[i].title,
               });
             }
           });
+          if (i == tabs.length - 1) {
+            console.log("inside fetcher");
+            fetch("https://api.mittaldev.com/tablify-dev/updateTabs", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                windows: final,
+              }),
+            })
+              .then((response) => {
+                if (response.ok) {
+                  console.log("sucess");
+                  return response.json();
+                } else {
+                  console.log(response);
+                }
+              })
+              .then((data) => {
+                console.log(data);
+              })
+              .catch((error) => {
+                console.error("Error:", error);
+              });
+          }
         });
-    });
+    }
 
     console.log("final", final);
-
-    fetch("https://api.mittaldev.com/tablify-dev/updateTabs", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        windows: final,
-      }),
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error("Network response was not ok");
-        }
-      })
-      .then((data) => {
-        console.log(data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
   });
 }, 5000);
-
-const pushToDB = (final) => {
-  console.log("final received", final);
-};
