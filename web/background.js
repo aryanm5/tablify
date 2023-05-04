@@ -1,7 +1,3 @@
-const collected = [];
-const windowIDS = [];
-const final = [];
-
 const scrapeData = () => {
   const mainTextElements = document.querySelectorAll(
     "p, h1, h2, h3, h4, h5, h6"
@@ -26,69 +22,63 @@ const scrapeData = () => {
   return newString;
 };
 
-/*
+setInterval(() => {
+  const final = [];
 
-[
-{id, tabs: [Tab]}
-]
-
-Tab: {
-	id, content, title
-}
-
-
-*/
-
-chrome.tabs.query({}, (tabs) => {
-  tabs.forEach((tab) => {
-    if (!windowIDS.includes(tab.windowId)) {
-      windowIDS.push(tab.windowId);
-    }
-
-    chrome.scripting
-      .executeScript({
-        target: { tabId: tab.id },
-        function: scrapeData,
-      })
-      .then((res) => {
-        const smoothWebsiteText = res[0].result.replace(/[\n\r]/g, "");
-        collected.push({
-          id: tab.id,
-          content: smoothWebsiteText,
-          title: tab.title,
-          windowID: tab.windowId,
-        });
-      });
+  chrome.windows.getAll({ populate: false }, (windows) => {
+    windows.forEach((window) => {
+      final.push({ id: window.id, tabs: [] });
+    });
   });
 
-  windowIDS.forEach((windowID) => {
-    final.push({ id: windowID, tabs: [] });
-  });
-
-  console.log("final", JSON.stringify(final));
-
-  console.log("jsoncollected", JSON.stringify(collected));
-
-  console.log("collected", collected);
-});
-
-/*
-
-  final.map((window) => {
-    console.log("windowid", window.id);
-    collected.forEach((tab) => {
-      console.log("tabWindowID", tab.windowiD);
-      console.log("inboth");
-      if (tab.windowID == window.id) {
-        window.tabs.push({
-          id: tab.id,
-          content: tab.content,
-          title: tab.title,
+  chrome.tabs.query({}, (tabs) => {
+    tabs.forEach((tab) => {
+      chrome.scripting
+        .executeScript({
+          target: { tabId: tab.id },
+          function: scrapeData,
+        })
+        .then((res) => {
+          const smoothWebsiteText = res[0].result.replace(/[\n\r]/g, "");
+          final.forEach((window) => {
+            if (tab.windowId == window.id) {
+              window.tabs.push({
+                id: tab.id,
+                content: smoothWebsiteText,
+                title: tab.title,
+              });
+            }
+          });
         });
-      }
     });
 
-    return window;
-  });
+    console.log("final", final);
 
-*/
+    fetch("https://api.mittaldev.com/tablify-dev/updateTabs", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        windows: final,
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("Network response was not ok");
+        }
+      })
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  });
+}, 5000);
+
+const pushToDB = (final) => {
+  console.log("final received", final);
+};
