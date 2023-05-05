@@ -89,14 +89,17 @@ setInterval(() => {
               }
             )
               .then((response) => {
-                console.log(response.json());
+                const promise1 = Promise.resolve(response.json());
+                promise1.then((res) => {
+                  console.log("realres", res);
+                });
                 if (response.ok) {
                   console.log("fetching back from database was good");
                 } else {
                   throw new Error("Network response was not ok");
                 }
               })
-              .then(() => {})
+              .then((res) => {})
               .catch((error) => {
                 console.error("Error:", error);
               });
