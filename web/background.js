@@ -54,7 +54,6 @@ setInterval(() => {
             }
           });
           if (i == tabs.length - 1) {
-            console.log("inside fetcher");
             fetch("https://api.mittaldev.com/tablify-dev/updateTabs", {
               method: "POST",
               headers: {
@@ -66,7 +65,6 @@ setInterval(() => {
             })
               .then((response) => {
                 if (response.ok) {
-                  console.log("sucess");
                   return response.json();
                 } else {
                   console.log(response);
@@ -75,6 +73,30 @@ setInterval(() => {
               .then((data) => {
                 console.log(data);
               })
+              .catch((error) => {
+                console.error("Error:", error);
+              });
+
+            fetch(
+              `https://api.mittaldev.com/tablify-dev/fetchGroups?windows=${JSON.stringify(
+                windowIDS
+              )}`,
+              {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            )
+              .then((response) => {
+                console.log(response.json());
+                if (response.ok) {
+                  console.log("fetching back from database was good");
+                } else {
+                  throw new Error("Network response was not ok");
+                }
+              })
+              .then(() => {})
               .catch((error) => {
                 console.error("Error:", error);
               });
