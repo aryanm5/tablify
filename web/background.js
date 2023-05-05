@@ -93,9 +93,7 @@ setInterval(() => {
                 promise1.then((res) => {
                   console.log("realres", res);
                 });
-                if (response.ok) {
-                  console.log("fetching back from database was good");
-                } else {
+                if (!response.ok) {
                   throw new Error("Network response was not ok");
                 }
               })
