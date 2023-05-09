@@ -91,8 +91,76 @@ setInterval(() => {
               .then((response) => {
                 const promise1 = Promise.resolve(response.json());
                 promise1.then((res) => {
-                  console.log("realres", res);
+                  // 0 history, 1 bio, 2 cs
+
+                  const vals = res[0];
+
+                  console.log("vals", vals);
+
+                  for (let i = 0; i < vals.groups.length; i++) {
+                    //console.log("vals.groups[i].tabs", vals.groups[i].tabs);
+
+                    const tabIds = [];
+
+                    vals.groups[i].tabs.forEach((tab) => {
+                      tabIds.push(parseInt(tab.id));
+                    });
+
+                    for (let j = 0; j < tabIds.length; j++) {
+                      chrome.tabs.get(tabIds[j], (tab) => {
+                        console.log(tab.id);
+                        if (chrome.runtime.lastError) {
+                          tabIds.splice(tab.id, 1);
+                        }
+                      });
+                    }
+
+                    console.log(i, tabIds);
+
+                    if (i === 0) {
+                      chrome.tabGroups.query({ title: "History" }, (group) => {
+                        if (group !== []) {
+                          chrome.tabs.group({ tabIds: tabIds });
+                        } else {
+                          chrome.tabs.group({
+                            tabIds: tabIds,
+                            groupId: group.id,
+                          });
+                        }
+                      });
+                    }
+
+                    if (i === 1) {
+                      chrome.tabGroups.query({ title: "Biology" }, (group) => {
+                        if (group !== []) {
+                          chrome.tabs.group({ tabIds: tabIds });
+                        } else {
+                          chrome.tabs.group({
+                            tabIds: tabIds,
+                            groupId: group.id,
+                          });
+                        }
+                      });
+                    }
+
+                    if (i === 2) {
+                      chrome.tabGroups.query(
+                        { title: "Computer Science" },
+                        (group) => {
+                          if (group !== []) {
+                            chrome.tabs.group({ tabIds: tabIds });
+                          } else {
+                            chrome.tabs.group({
+                              tabIds: tabIds,
+                              groupId: group.id,
+                            });
+                          }
+                        }
+                      );
+                    }
+                  }
                 });
+
                 if (!response.ok) {
                   throw new Error("Network response was not ok");
                 }
