@@ -1,1 +1,1 @@
-# Chrome extention interface
+# Chrome extension interface
