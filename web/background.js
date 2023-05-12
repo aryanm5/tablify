@@ -1,25 +1,18 @@
-const scrapeData = () => {
-  const mainTextElements = document.querySelectorAll(
-    "p, h1, h2, h3, h4, h5, h6"
-  );
-  const mainText = Array.from(mainTextElements)
-    .map((element) => element.textContent)
-    .join("\n");
+const scrapeData = async (tabURL) => {
+  const url = `https://tldr-text-analysis.p.rapidapi.com/summarize/?text=${tabURL}&max_sentences=15`;
 
-  const chunks = mainText.split(/\n{2,}|\r{2,}|\r\n{2,}/);
-  let largestChunk = "";
-  let chunk = "";
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "X-RapidAPI-Key": "a59c5eb4e0msh3d352fe13ead54bp10bed5jsnb62886024135",
+      "X-RapidAPI-Host": "tldr-text-analysis.p.rapidapi.com",
+    },
+  });
 
-  for (let i = 0; i < chunks.length; i++) {
-    chunk = chunks[i].trim();
-    if (chunk.length > largestChunk.length) {
-      largestChunk = chunk;
-    }
-  }
+  const data = await response.json();
 
-  let inter = largestChunk;
-  let newString = inter.replace(/['"]/g, "");
-  return newString;
+  console.log("resolvedpromisefinally", data.summary);
+  return data.summary;
 };
 
 setInterval(() => {
@@ -41,6 +34,7 @@ setInterval(() => {
         .executeScript({
           target: { tabId: tabs[i].id },
           function: scrapeData,
+          args: [tabs[i].url],
         })
         .then((res) => {
           const smoothWebsiteText = res[0].result.replace(/[\n\r]/g, "");
@@ -108,7 +102,6 @@ setInterval(() => {
 
                     for (let j = 0; j < tabIds.length; j++) {
                       chrome.tabs.get(tabIds[j], (tab) => {
-                        console.log(tab.id);
                         if (chrome.runtime.lastError) {
                           tabIds.splice(tab.id, 1);
                         }
@@ -118,42 +111,87 @@ setInterval(() => {
                     console.log(i, tabIds);
 
                     if (i === 0) {
-                      chrome.tabGroups.query({ title: "History" }, (group) => {
-                        if (group !== []) {
-                          chrome.tabs.group({ tabIds: tabIds });
-                        } else {
-                          chrome.tabs.group({
-                            tabIds: tabIds,
-                            groupId: group.id,
-                          });
+                      console.log("i is 0");
+                      chrome.tabGroups.query(
+                        { title: "History" },
+                        (TabGroup) => {
+                          console.log(TabGroup);
+                          if (JSON.stringify(TabGroup) !== JSON.stringify([])) {
+                            chrome.tabs.group({
+                              tabIds: tabIds,
+                              groupId: TabGroup[0].id,
+                            });
+                          } else {
+                            chrome.tabs.group(
+                              {
+                                tabIds: tabIds,
+                              },
+                              (groupId) => {
+                                chrome.tabGroups.update(groupId, {
+                                  title: "History",
+                                  color: "blue",
+                                  collapsed: true,
+                                });
+                              }
+                            );
+                          }
                         }
-                      });
+                      );
                     }
 
                     if (i === 1) {
-                      chrome.tabGroups.query({ title: "Biology" }, (group) => {
-                        if (group !== []) {
-                          chrome.tabs.group({ tabIds: tabIds });
-                        } else {
-                          chrome.tabs.group({
-                            tabIds: tabIds,
-                            groupId: group.id,
-                          });
+                      console.log("i is 1");
+                      chrome.tabGroups.query(
+                        { title: "Biology" },
+                        (TabGroup) => {
+                          console.log(TabGroup);
+                          if (JSON.stringify(TabGroup) !== JSON.stringify([])) {
+                            chrome.tabs.group({
+                              tabIds: tabIds,
+                              groupId: TabGroup[0].id,
+                            });
+                          } else {
+                            chrome.tabs.group(
+                              {
+                                tabIds: tabIds,
+                              },
+                              (groupId) => {
+                                chrome.tabGroups.update(groupId, {
+                                  title: "Biology",
+                                  color: "red",
+                                  collapsed: true,
+                                });
+                              }
+                            );
+                          }
                         }
-                      });
+                      );
                     }
 
                     if (i === 2) {
+                      console.log("i is 2");
                       chrome.tabGroups.query(
                         { title: "Computer Science" },
-                        (group) => {
-                          if (group !== []) {
-                            chrome.tabs.group({ tabIds: tabIds });
-                          } else {
+                        (TabGroup) => {
+                          console.log(TabGroup);
+                          if (JSON.stringify(TabGroup) !== JSON.stringify([])) {
                             chrome.tabs.group({
                               tabIds: tabIds,
-                              groupId: group.id,
+                              groupId: TabGroup[0].id,
                             });
+                          } else {
+                            chrome.tabs.group(
+                              {
+                                tabIds: tabIds,
+                              },
+                              (groupId) => {
+                                chrome.tabGroups.update(groupId, {
+                                  title: "Computer Science",
+                                  color: "green",
+                                  collapsed: true,
+                                });
+                              }
+                            );
                           }
                         }
                       );
