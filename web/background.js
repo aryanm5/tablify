@@ -51,7 +51,7 @@ setInterval(() => {
             }
           }
         });
-      }, 300000);
+      }, 900000);
 
       chrome.scripting
         .executeScript({
