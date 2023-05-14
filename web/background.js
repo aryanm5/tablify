@@ -51,7 +51,7 @@ setInterval(() => {
             }
           }
         });
-      }, 900000);
+      }, 1000000);
 
       chrome.scripting
         .executeScript({
@@ -63,14 +63,18 @@ setInterval(() => {
           const smoothWebsiteText = res[0].result.replace(/[\n\r]/g, "");
           final.forEach((window) => {
             if (tabs[i].windowId == window.id) {
+              console.log("popuatign window " + i);
               window.tabs.push({
                 id: tabs[i].id.toString(),
                 content: smoothWebsiteText,
                 title: tabs[i].title,
+                url: tabs[i].url,
               });
             }
           });
+          console.log("tabslen", tabs.length);
           if (i == tabs.length - 1) {
+            console.log(JSON.stringify(final));
             fetch("https://api.mittaldev.com/tablify-dev/updateTabs", {
               method: "POST",
               headers: {
