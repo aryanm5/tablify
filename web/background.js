@@ -29,7 +29,30 @@ setInterval(() => {
   console.log("windowids", windowIDS);
 
   chrome.tabs.query({}, (tabs) => {
+    var timeoutMap = {};
+
+    chrome.tabs.onActivated.addListener(function (activeInfo) {
+      var tabId = activeInfo.tabId;
+      clearTimeout(timeoutMap[tabId]);
+    });
+
+    chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+      clearTimeout(timeoutMap[tabId]);
+    });
+
     for (let i = 0; i < tabs.length; i++) {
+      timeoutMap[tabs[i].id] = setTimeout(function () {
+        chrome.tabs.query({ active: false }, function (inactiveTabs) {
+          for (var j = 0; j < inactiveTabs.length; j++) {
+            var inactiveTab = inactiveTabs[j];
+            if (inactiveTab.id === tabs[i].id) {
+              chrome.tabs.remove(tabs[i].id);
+              break;
+            }
+          }
+        });
+      }, 300000);
+
       chrome.scripting
         .executeScript({
           target: { tabId: tabs[i].id },
